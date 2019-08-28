@@ -41,14 +41,15 @@ class CardGroupEndpoint(
     }
 
     @GetMapping("{id}")
-    fun getById(@PathVariable id: Int) = cardGroupRepository.findById(id)
+    fun getById(@PathVariable id: Int): CardGroup = cardGroupRepository.findById(id)
+            .orElseThrow { ResourceNotFoundException(CardGroup::class, id) }
 
     //todo bind to current user (get from credentials)
     @PostMapping
     fun create(@RequestBody newCardGroup: NewCardGroup): ResponseEntity<Any> {
         val cardGroup = createCardGroup(newCardGroup)
 
-        return ResponseEntity.created(buildLocation("{id}", cardGroup.id)).build()
+        return ResponseEntity.created(buildLocation(cardGroup.id)).build()
     }
 
     @PostMapping("{id}/cards")
@@ -61,7 +62,7 @@ class CardGroupEndpoint(
         }
 
         val card = createCard(maybeCardGroup.get(), newCard)
-        return ResponseEntity.created(buildLocation("{id}", card.id)).build()
+        return ResponseEntity.created(buildLocation(card.id)).build()
     }
 
     @GetMapping("{id}/cards")
@@ -82,7 +83,7 @@ class CardGroupEndpoint(
     private fun createCard(group: CardGroup, newCard: NewCard) = Card().apply {
         subject = newCard.subject
         content = newCard.content
-        answers = createListOfAnswers(this, newCard.answers) as MutableList<Answer>
+        answers = createListOfAnswers(this, newCard.answers).toMutableList()
     }.also { cardRepository.save(it) }.also { group.cards.add(it) }
 
     private fun createListOfAnswers(card: Card, answers: List<NewAnswer>) = answers.map {
@@ -99,10 +100,10 @@ class CardGroupEndpoint(
         return cardGroupRepository.save(cardGroup)
     }
 
-    private fun buildLocation(relPath: String, vararg args: Any) =
+    private fun buildLocation(id: Int) =
             ServletUriComponentsBuilder
                     .fromCurrentRequest()
-                    .path(relPath)
-                    .buildAndExpand(args)
+                    .path("/{id}")
+                    .buildAndExpand(id)
                     .toUri()
 }
