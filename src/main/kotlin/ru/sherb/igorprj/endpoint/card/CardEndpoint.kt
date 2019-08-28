@@ -1,0 +1,35 @@
+package ru.sherb.igorprj.endpoint.card
+
+import org.springframework.http.ResponseEntity
+import org.springframework.transaction.annotation.Transactional
+import org.springframework.web.bind.annotation.PatchMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.RequestMapping
+import ru.sherb.igorprj.endpoint.EndpointVersion1
+import ru.sherb.igorprj.repository.CardRepository
+
+/**
+ * @author maksim
+ * @since 28.08.2019
+ */
+@EndpointVersion1
+@RequestMapping("cards")
+class CardEndpoint(
+        val cardRepository: CardRepository
+) {
+
+    @Transactional
+    @PatchMapping("{id}")
+    fun changeSubject(@PathVariable id: Int, subject: String): ResponseEntity<Any> {
+        val maybeCard = cardRepository.findById(id)
+
+        if (maybeCard.isEmpty) {
+            return ResponseEntity.notFound().build() //fixme add error message
+        }
+
+        val card = maybeCard.get()
+        card.subject = subject
+
+        return ResponseEntity.ok().build()
+    }
+}

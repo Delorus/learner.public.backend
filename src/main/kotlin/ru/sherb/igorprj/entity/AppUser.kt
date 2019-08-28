@@ -1,27 +1,49 @@
 package ru.sherb.igorprj.entity
 
-import org.springframework.data.annotation.Immutable
-import javax.persistence.*
+import org.hibernate.annotations.CreationTimestamp
+import org.hibernate.annotations.SQLDelete
+import org.hibernate.annotations.UpdateTimestamp
+import org.hibernate.annotations.Where
+import java.time.Instant
+import javax.persistence.Column
+import javax.persistence.Entity
+import javax.persistence.FetchType
+import javax.persistence.GeneratedValue
+import javax.persistence.Id
+import javax.persistence.JoinColumn
+import javax.persistence.OneToMany
+import javax.validation.constraints.Email
 
 /**
  * @author maksim
  * @since 26.08.2019
  */
 @Entity
-@Immutable
-class AppUser(
+@Where(clause = "removed = false") //todo add data cleaner scheduling task
+@SQLDelete(sql = "update app_user set removed = true where id = ?")
+class AppUser {
 
-        @Id
-        @GeneratedValue
-        val id: Int,
+    @Id
+    @GeneratedValue
+    var id: Int = 0
 
-        @Column
-        val externalId: String,
+    @Email
+    @Column
+    var email: String? = null
 
-        @OneToMany
-        @JoinColumn
-        val groups: List<CardGroup>?
-) {
+    @JoinColumn
+    @OneToMany(fetch = FetchType.LAZY)
+    var groups: List<CardGroup>? = null
+
+    @CreationTimestamp
+    val creationDate: Instant = Instant.now()
+
+    @UpdateTimestamp
+    var updateDate: Instant = Instant.now()
+
+    @Column
+    var removed: Boolean = false
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
