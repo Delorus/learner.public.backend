@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 import ru.sherb.igorprj.endpoint.EndpointVersion1
+import ru.sherb.igorprj.endpoint.ResourceNotFoundException
 import ru.sherb.igorprj.entity.Answer
 import ru.sherb.igorprj.entity.Card
 import ru.sherb.igorprj.entity.CardGroup
@@ -56,7 +57,7 @@ class CardGroupEndpoint(
         val maybeCardGroup = cardGroupRepository.findById(id)
 
         if (maybeCardGroup.isEmpty) {
-            return ResponseEntity.notFound().build() //fixme add error message
+            throw ResourceNotFoundException(CardGroup::class, id)
         }
 
         val card = createCard(maybeCardGroup.get(), newCard)
@@ -71,7 +72,7 @@ class CardGroupEndpoint(
         val maybeCardGroup = cardGroupRepository.findById(id)
 
         if (maybeCardGroup.isEmpty) {
-            return ResponseEntity.notFound().build() //fixme add error message
+            throw ResourceNotFoundException(CardGroup::class, id)
         }
 
         val page = cardRepository.findAll(PageRequest.of(offset, limit))

@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import ru.sherb.igorprj.endpoint.EndpointVersion1
+import ru.sherb.igorprj.endpoint.ResourceNotFoundException
+import ru.sherb.igorprj.entity.Card
 import ru.sherb.igorprj.repository.CardRepository
 
 /**
@@ -24,7 +26,7 @@ class CardEndpoint(
         val maybeCard = cardRepository.findById(id)
 
         if (maybeCard.isEmpty) {
-            return ResponseEntity.notFound().build() //fixme add error message
+            throw ResourceNotFoundException(Card::class, id)
         }
 
         val card = maybeCard.get()
