@@ -5,7 +5,7 @@ import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
-import ru.sherb.igorprj.endpoint.EndpointVersion1
+import org.springframework.web.bind.annotation.RestController
 import ru.sherb.igorprj.endpoint.ResourceNotFoundException
 import ru.sherb.igorprj.entity.Card
 import ru.sherb.igorprj.repository.CardRepository
@@ -14,8 +14,8 @@ import ru.sherb.igorprj.repository.CardRepository
  * @author maksim
  * @since 28.08.2019
  */
-@EndpointVersion1
-@RequestMapping("cards")
+@RestController
+@RequestMapping("v1/cards")
 class CardEndpoint(
         val cardRepository: CardRepository
 ) {

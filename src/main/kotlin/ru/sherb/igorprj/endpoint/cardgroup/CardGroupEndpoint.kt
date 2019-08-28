@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder
-import ru.sherb.igorprj.endpoint.EndpointVersion1
 import ru.sherb.igorprj.endpoint.ResourceNotFoundException
 import ru.sherb.igorprj.entity.Answer
 import ru.sherb.igorprj.entity.Card
@@ -24,8 +24,8 @@ import ru.sherb.igorprj.repository.CardRepository
  * @author maksim
  * @since 27.08.2019
  */
-@EndpointVersion1
-@RequestMapping("packs")
+@RestController
+@RequestMapping("v1/packs")
 class CardGroupEndpoint(
         val cardGroupRepository: CardGroupRepository,
         val answerRepository: AnswerRepository,
