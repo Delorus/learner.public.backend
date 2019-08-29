@@ -16,8 +16,10 @@ import ru.sherb.igorprj.endpoint.ResourceNotFoundException
 import ru.sherb.igorprj.persist.entity.Answer
 import ru.sherb.igorprj.persist.entity.Card
 import ru.sherb.igorprj.persist.entity.CardGroup
+import ru.sherb.igorprj.persist.entity.CardGroupSearchStatistic
 import ru.sherb.igorprj.persist.repository.AnswerRepository
 import ru.sherb.igorprj.persist.repository.CardGroupRepository
+import ru.sherb.igorprj.persist.repository.CardGroupSearchStatisticRepository
 import ru.sherb.igorprj.persist.repository.CardRepository
 
 /**
@@ -27,15 +29,26 @@ import ru.sherb.igorprj.persist.repository.CardRepository
 @RestController
 @RequestMapping("v1/packs")
 class CardGroupEndpoint(
+        val cardGroupSearchStatisticRepository: CardGroupSearchStatisticRepository,
         val cardGroupRepository: CardGroupRepository,
         val answerRepository: AnswerRepository,
         val cardRepository: CardRepository
 ) {
 
     @GetMapping
+    @Transactional
     fun getPage(@RequestParam(required = false) query: String?, //fixme ignoring query param
                 @RequestParam offset: Int,
                 @RequestParam limit: Int): Page<CardGroup> {
+
+        query?.also {
+            val updated = cardGroupSearchStatisticRepository.incNumOfQueryRequest(it)
+            if (updated == 0) {
+                cardGroupSearchStatisticRepository.save(CardGroupSearchStatistic().apply {
+                    queryText = it
+                })
+            }
+        }
 
         return cardGroupRepository.findAll(PageRequest.of(offset, limit))
     }
