@@ -1,4 +1,4 @@
-package ru.sherb.igorprj.entity
+package ru.sherb.igorprj.persist.entity
 
 import org.hibernate.annotations.Cache
 import org.hibernate.annotations.CacheConcurrencyStrategy

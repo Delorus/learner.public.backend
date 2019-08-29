@@ -1,7 +1,7 @@
-package ru.sherb.igorprj.repository
+package ru.sherb.igorprj.persist.repository
 
 import org.springframework.data.repository.PagingAndSortingRepository
-import ru.sherb.igorprj.entity.Card
+import ru.sherb.igorprj.persist.entity.Card
 
 /**
  * @author maksim

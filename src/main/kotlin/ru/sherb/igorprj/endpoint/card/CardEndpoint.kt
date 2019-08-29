@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import ru.sherb.igorprj.endpoint.ResourceNotFoundException
-import ru.sherb.igorprj.entity.Card
-import ru.sherb.igorprj.repository.CardRepository
+import ru.sherb.igorprj.persist.entity.Card
+import ru.sherb.igorprj.persist.repository.CardRepository
 
 /**
  * @author maksim

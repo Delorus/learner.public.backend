@@ -13,12 +13,12 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 import ru.sherb.igorprj.endpoint.ResourceNotFoundException
-import ru.sherb.igorprj.entity.Answer
-import ru.sherb.igorprj.entity.Card
-import ru.sherb.igorprj.entity.CardGroup
-import ru.sherb.igorprj.repository.AnswerRepository
-import ru.sherb.igorprj.repository.CardGroupRepository
-import ru.sherb.igorprj.repository.CardRepository
+import ru.sherb.igorprj.persist.entity.Answer
+import ru.sherb.igorprj.persist.entity.Card
+import ru.sherb.igorprj.persist.entity.CardGroup
+import ru.sherb.igorprj.persist.repository.AnswerRepository
+import ru.sherb.igorprj.persist.repository.CardGroupRepository
+import ru.sherb.igorprj.persist.repository.CardRepository
 
 /**
  * @author maksim
@@ -40,7 +40,7 @@ class CardGroupEndpoint(
         return cardGroupRepository.findAll(PageRequest.of(offset, limit))
     }
 
-    @GetMapping("{id}")
+    @GetMapping("{id}") //todo lazy load cards (only first, other on request)
     fun getById(@PathVariable id: Int): CardGroup = cardGroupRepository.findById(id)
             .orElseThrow { ResourceNotFoundException(CardGroup::class, id) }
 

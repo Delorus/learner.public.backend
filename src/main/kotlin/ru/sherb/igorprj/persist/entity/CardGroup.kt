@@ -1,8 +1,8 @@
-package ru.sherb.igorprj.entity
+package ru.sherb.igorprj.persist.entity
 
-import org.hibernate.annotations.Cache
-import org.hibernate.annotations.CacheConcurrencyStrategy
 import org.hibernate.annotations.CreationTimestamp
+import org.hibernate.annotations.LazyCollection
+import org.hibernate.annotations.LazyCollectionOption
 import org.hibernate.annotations.SQLDelete
 import org.hibernate.annotations.UpdateTimestamp
 import org.hibernate.annotations.Where
@@ -22,23 +22,26 @@ import javax.persistence.OneToMany
  */
 @Entity
 @Where(clause = "removed = false")
-@SQLDelete(sql = "update card set removed = true where id = ?")
-@Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
-class Card {
+@SQLDelete(sql = "update card_group set removed = true where id = ?")
+class CardGroup {
 
     @Id
     @GeneratedValue
     var id: Int = 0
 
-    @Column(nullable = false)
-    var subject: String = ""
+    @Column
+    var topic: String? = null
 
     @Column
-    var content: String? = null
+    var tags: HashSet<String>? = null
+
+    @Column
+    var isPrivate: Boolean = true
 
     @JoinColumn(nullable = false)
-    @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
-    var answers: MutableList<Answer> = mutableListOf()
+    @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
+    @LazyCollection(LazyCollectionOption.EXTRA)
+    var cards: MutableList<Card> = mutableListOf()
 
     @CreationTimestamp
     val creationDate: Instant = Instant.now()
@@ -53,7 +56,7 @@ class Card {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
-        other as Card
+        other as CardGroup
 
         if (id != other.id) return false
 

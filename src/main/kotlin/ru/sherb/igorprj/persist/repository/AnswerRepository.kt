@@ -1,8 +1,8 @@
-package ru.sherb.igorprj.repository
+package ru.sherb.igorprj.persist.repository
 
 import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository
-import ru.sherb.igorprj.entity.Answer
+import ru.sherb.igorprj.persist.entity.Answer
 
 /**
  * @author maksim
