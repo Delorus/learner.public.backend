@@ -3,6 +3,7 @@ package ru.sherb.igorprj.persist.entity
 import org.hibernate.annotations.Cache
 import org.hibernate.annotations.CacheConcurrencyStrategy
 import org.hibernate.annotations.CreationTimestamp
+import org.hibernate.annotations.NaturalId
 import org.hibernate.annotations.SQLDelete
 import org.hibernate.annotations.UpdateTimestamp
 import org.hibernate.annotations.Where
@@ -21,13 +22,14 @@ import javax.validation.constraints.NotBlank
 @Where(clause = "removed = false")
 @SQLDelete(sql = "update answer set removed = true where id = ?")
 @Cache(usage = CacheConcurrencyStrategy.READ_ONLY)
-class Answer {
+open class Answer {
 
     @Id
     @GeneratedValue
     var id: Int = 0
 
     @NotBlank
+    @NaturalId
     @Column(nullable = false)
     var text: String = ""
 
@@ -49,10 +51,10 @@ class Answer {
 
         other as Answer
 
-        if (id != other.id) return false
+        if (text != other.text) return false
 
         return true
     }
 
-    override fun hashCode() = id
+    override fun hashCode() = text.hashCode()
 }

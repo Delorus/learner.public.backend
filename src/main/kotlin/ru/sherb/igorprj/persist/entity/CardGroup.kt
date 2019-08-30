@@ -23,7 +23,7 @@ import javax.persistence.OneToMany
 @Entity
 @Where(clause = "removed = false")
 @SQLDelete(sql = "update card_group set removed = true where id = ?")
-class CardGroup {
+open class CardGroup {
 
     @Id
     @GeneratedValue

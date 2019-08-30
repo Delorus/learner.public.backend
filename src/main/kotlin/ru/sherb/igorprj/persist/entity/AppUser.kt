@@ -1,6 +1,7 @@
 package ru.sherb.igorprj.persist.entity
 
 import org.hibernate.annotations.CreationTimestamp
+import org.hibernate.annotations.NaturalId
 import org.hibernate.annotations.SQLDelete
 import org.hibernate.annotations.UpdateTimestamp
 import org.hibernate.annotations.Where
@@ -21,7 +22,7 @@ import javax.validation.constraints.Email
 @Entity
 @Where(clause = "removed = false") //todo add data cleaner scheduling task
 @SQLDelete(sql = "update app_user set removed = true where id = ?")
-class AppUser {
+open class AppUser {
 
     @Id
     @GeneratedValue
@@ -29,6 +30,7 @@ class AppUser {
 
     @Email
     @Column
+    @NaturalId
     var email: String? = null
 
     @JoinColumn
@@ -50,10 +52,12 @@ class AppUser {
 
         other as AppUser
 
-        if (id != other.id) return false
+        if (email != other.email) return false
 
         return true
     }
 
-    override fun hashCode() = id
+    override fun hashCode(): Int {
+        return email?.hashCode() ?: 0
+    }
 }

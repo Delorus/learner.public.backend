@@ -14,7 +14,6 @@ import javax.persistence.FetchType
 import javax.persistence.GeneratedValue
 import javax.persistence.Id
 import javax.persistence.JoinColumn
-import javax.persistence.Lob
 import javax.persistence.OneToMany
 
 /**
@@ -25,7 +24,7 @@ import javax.persistence.OneToMany
 @Where(clause = "removed = false")
 @SQLDelete(sql = "update card set removed = true where id = ?")
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-class Card {
+open class Card {
 
     @Id
     @GeneratedValue

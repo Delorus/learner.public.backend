@@ -14,7 +14,7 @@ import javax.persistence.Table
  */
 @Entity
 @Table(indexes = [Index(columnList = "queryText", unique = true)])
-class CardGroupSearchStatistic{
+open class CardGroupSearchStatistic{
 
     @Id
     @GeneratedValue
