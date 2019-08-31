@@ -32,7 +32,7 @@ import ru.sherb.igorprj.persist.repository.CardRepository
  * @since 27.08.2019
  */
 @RestController
-@RequestMapping("v1/packs")
+@RequestMapping("v1/packs", consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
 class CardGroupEndpoint(
         val cardGroupSearchStatisticRepository: CardGroupSearchStatisticRepository,
         val cardGroupRepository: CardGroupRepository,
@@ -117,7 +117,7 @@ class CardGroupEndpoint(
     private fun createCard(group: CardGroup, newCard: NewCard): Card<*> {
         val initCard: Card<*>.() -> Unit = {
             subject = newCard.subject
-            answers = createListOfAnswers(this, newCard.answers)
+            answers = if (newCard.answers != null) createListOfAnswers(this, newCard.answers) else mutableListOf()
             orderNum = group.cardsCount
         }
 

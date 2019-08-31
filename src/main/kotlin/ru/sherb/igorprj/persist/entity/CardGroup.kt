@@ -41,7 +41,9 @@ open class CardGroup {
     @Column
     open var isPrivate: Boolean = true
 
-    @JoinColumn(nullable = false)
+    // not null, but there are some cards in the "building" status
+    // todo clean building cards after some time
+    @JoinColumn
     @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
     @LazyCollection(LazyCollectionOption.EXTRA)
     @OrderBy("orderNum")

@@ -7,7 +7,7 @@ package ru.sherb.igorprj.endpoint.cardgroup
 data class NewCard(
         val subject: String,
         val contentType: ContentType,
-        val answers: List<NewAnswer>
+        val answers: List<NewAnswer>?
 )
 
 enum class ContentType {

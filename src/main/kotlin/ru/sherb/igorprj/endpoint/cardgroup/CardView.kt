@@ -19,11 +19,12 @@ data class CardView(
     constructor(card: Card<*>) : this(
             id = card.id,
             subject = card.subject,
-            answers = mapAnswerEntitiesToViews(card.answers)
+            answers = if (card.answers.isNotEmpty()) mapAnswerEntitiesToViews(card.answers) else emptyList()
     )
 }
 
 private fun mapAnswerEntitiesToViews(answers: Iterable<Answer>): List<AnswerView> {
+
     val rightAnswer = answers.single(Answer::isRight)
     return answers.shuffled()
             .asSequence()
