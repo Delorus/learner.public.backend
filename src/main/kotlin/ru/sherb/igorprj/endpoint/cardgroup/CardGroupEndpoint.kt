@@ -2,6 +2,7 @@ package ru.sherb.igorprj.endpoint.cardgroup
 
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
+import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.GetMapping
@@ -11,12 +12,16 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 import ru.sherb.igorprj.endpoint.ResourceNotFoundException
 import ru.sherb.igorprj.persist.entity.Answer
 import ru.sherb.igorprj.persist.entity.Card
 import ru.sherb.igorprj.persist.entity.CardGroup
 import ru.sherb.igorprj.persist.entity.CardGroupSearchStatistic
+import ru.sherb.igorprj.persist.entity.ExternalCard
+import ru.sherb.igorprj.persist.entity.MultimediaCard
+import ru.sherb.igorprj.persist.entity.TextCard
 import ru.sherb.igorprj.persist.repository.AnswerRepository
 import ru.sherb.igorprj.persist.repository.CardGroupRepository
 import ru.sherb.igorprj.persist.repository.CardGroupSearchStatisticRepository
@@ -39,7 +44,7 @@ class CardGroupEndpoint(
     @Transactional
     fun getPage(@RequestParam(required = false) query: String?, //fixme ignoring query param
                 @RequestParam offset: Int,
-                @RequestParam limit: Int): Page<CardGroup> {
+                @RequestParam limit: Int): Page<CardGroupListView> {
 
         query?.also {
             val updated = cardGroupSearchStatisticRepository.incNumOfQueryRequest(it)
@@ -50,12 +55,17 @@ class CardGroupEndpoint(
             }
         }
 
-        return cardGroupRepository.findAll(PageRequest.of(offset, limit))
+        return cardGroupRepository.findAll(PageRequest.of(offset, limit)).map(::CardGroupListView)
     }
 
-    @GetMapping("{id}") //todo lazy load cards (only first, other on request)
-    fun getById(@PathVariable id: Int): CardGroup = cardGroupRepository.findById(id)
-            .orElseThrow { ResourceNotFoundException(CardGroup::class, id) }
+    @GetMapping("{id}")
+    fun getById(@PathVariable id: Int,
+                @RequestParam(required = false, defaultValue = "4") fetchCard: Int): CardGroupView
+            = cardGroupRepository.findById(id)
+                .map { CardGroupView(it, fetchCard) }
+                .orElseThrow { ResourceNotFoundException(CardGroup::class, id) }
+
+    //todo to public card group endpoint
 
     //todo bind to current user (get from credentials)
     @PostMapping
@@ -65,9 +75,9 @@ class CardGroupEndpoint(
         return ResponseEntity.created(buildLocation(cardGroup.id)).build()
     }
 
-    @PostMapping("{id}/cards")
     @Transactional
-    fun addCard(@PathVariable id: Int, newCard: NewCard): ResponseEntity<Any> {
+    @PostMapping("{id}/cards", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
+    fun addCard(@PathVariable id: Int, newCard: NewCard, content: MultipartFile): ResponseEntity<Any> {
         val maybeCardGroup = cardGroupRepository.findById(id)
 
         if (maybeCardGroup.isEmpty) {
@@ -75,13 +85,15 @@ class CardGroupEndpoint(
         }
 
         val card = createCard(maybeCardGroup.get(), newCard)
+        card.saveContent(content.inputStream)
+
         return ResponseEntity.created(buildLocation(card.id)).build()
     }
 
     @GetMapping("{id}/cards")
     fun getCards(@PathVariable id: Int,
                  @RequestParam offset: Int,
-                 @RequestParam limit: Int): ResponseEntity<Page<Card>> {
+                 @RequestParam limit: Int): ResponseEntity<Page<CardView>> {
 
         val maybeCardGroup = cardGroupRepository.findById(id)
 
@@ -89,22 +101,41 @@ class CardGroupEndpoint(
             throw ResourceNotFoundException(CardGroup::class, id)
         }
 
-        val page = cardRepository.findAll(PageRequest.of(offset, limit))
+        val page = cardRepository.findAll(PageRequest.of(offset, limit)).map { card ->
+            val view = CardView(card)
+            if (card is TextCard) {
+                view.content = card.loadContent()
+            } else {
+                view.contentLocation = buildLocation(card.id, addPath = "content").toASCIIString()
+            }
+
+            return@map view
+        }
         return ResponseEntity.ok(page)
     }
 
-    private fun createCard(group: CardGroup, newCard: NewCard) = Card().apply {
-        subject = newCard.subject
-        content = newCard.content
-        answers = createListOfAnswers(this, newCard.answers).toMutableList()
-    }.also { cardRepository.save(it) }.also { group.cards.add(it) }
+    private fun createCard(group: CardGroup, newCard: NewCard): Card<*> {
+        val initCard: Card<*>.() -> Unit = {
+            subject = newCard.subject
+            answers = createListOfAnswers(this, newCard.answers)
+            orderNum = group.cardsCount
+        }
 
-    private fun createListOfAnswers(card: Card, answers: List<NewAnswer>) = answers.map {
+        val card = when (newCard.contentType) {
+            ContentType.BINARY -> MultimediaCard().apply(initCard)
+            ContentType.TEXT -> TextCard().apply(initCard)
+            ContentType.EXTERNAL -> ExternalCard().apply(initCard)
+        }
+
+        return cardRepository.save(card).also(group::addCard)
+    }
+
+    private fun createListOfAnswers(parent: Card<*>, answers: List<NewAnswer>) = answers.map {
         Answer().apply {
             text = it.text
             isRight = it.isRight
         }
-    }.onEach { answerRepository.save(it) }.onEach { card.answers.add(it) }
+    }.onEach { answerRepository.save(it) }.onEach { parent.answers.add(it) }.toMutableList()
 
     private fun createCardGroup(newCardGroup: NewCardGroup): CardGroup {
         val cardGroup = CardGroup()
@@ -113,10 +144,10 @@ class CardGroupEndpoint(
         return cardGroupRepository.save(cardGroup)
     }
 
-    private fun buildLocation(id: Int) =
+    private fun buildLocation(id: Int, addPath: String = "") =
             ServletUriComponentsBuilder
                     .fromCurrentRequest()
-                    .path("/{id}")
+                    .path("/{id}/$addPath")
                     .buildAndExpand(id)
                     .toUri()
 }

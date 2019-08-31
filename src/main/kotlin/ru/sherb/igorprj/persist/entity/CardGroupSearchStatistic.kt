@@ -18,14 +18,14 @@ open class CardGroupSearchStatistic{
 
     @Id
     @GeneratedValue
-    var id: Int = 0
+    open var id: Int = 0
 
     @NaturalId
     @Column(updatable = false, nullable = false)
-    var queryText: String = ""
+    open lateinit var queryText: String
 
     @Column
-    var numberOfRequest: Int = 1
+    open var numberOfRequest: Int = 1
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

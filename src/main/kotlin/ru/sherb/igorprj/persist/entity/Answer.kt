@@ -26,24 +26,24 @@ open class Answer {
 
     @Id
     @GeneratedValue
-    var id: Int = 0
+    open var id: Int = 0
 
     @NotBlank
     @NaturalId
     @Column(nullable = false)
-    var text: String = ""
+    open lateinit var text: String
 
     @Column(nullable = false)
-    var isRight: Boolean = false
+    open var isRight: Boolean = false
 
     @CreationTimestamp
-    val creationDate: Instant = Instant.now()
+    open lateinit var creationDate: Instant
 
     @UpdateTimestamp
-    var updateDate: Instant = Instant.now()
+    open lateinit var updateDate: Instant
 
     @Column
-    var removed: Boolean = false
+    open var removed: Boolean = false
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

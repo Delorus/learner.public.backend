@@ -26,25 +26,25 @@ open class AppUser {
 
     @Id
     @GeneratedValue
-    var id: Int = 0
+    open var id: Int = 0
 
     @Email
     @Column
     @NaturalId
-    var email: String? = null
+    open var email: String? = null
 
     @JoinColumn
     @OneToMany(fetch = FetchType.LAZY)
-    var groups: List<CardGroup>? = null
+    open var groups: MutableList<CardGroup>? = null
 
     @CreationTimestamp
-    val creationDate: Instant = Instant.now()
+    open lateinit var creationDate: Instant
 
     @UpdateTimestamp
-    var updateDate: Instant = Instant.now()
+    open lateinit var updateDate: Instant
 
     @Column
-    var removed: Boolean = false
+    open var removed: Boolean = false
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

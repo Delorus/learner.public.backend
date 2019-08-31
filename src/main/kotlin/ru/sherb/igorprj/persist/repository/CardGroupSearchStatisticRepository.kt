@@ -15,8 +15,8 @@ interface CardGroupSearchStatisticRepository : JpaRepository<CardGroupSearchStat
 
     @Modifying
     @Query("""
-        update card_group_search_statistic
-        set number_of_request=number_of_request+1 
-        where query_text=:queryText""", nativeQuery = true)
+        update CardGroupSearchStatistic stat 
+        set stat.numberOfRequest=stat.numberOfRequest+1 
+        where stat.queryText=:queryText""")
     fun incNumOfQueryRequest(queryText: String): Int
 }

@@ -9,12 +9,14 @@ import org.hibernate.annotations.Where
 import java.time.Instant
 import javax.persistence.CascadeType
 import javax.persistence.Column
+import javax.persistence.ElementCollection
 import javax.persistence.Entity
 import javax.persistence.FetchType
 import javax.persistence.GeneratedValue
 import javax.persistence.Id
 import javax.persistence.JoinColumn
 import javax.persistence.OneToMany
+import javax.persistence.OrderBy
 
 /**
  * @author maksim
@@ -27,30 +29,40 @@ open class CardGroup {
 
     @Id
     @GeneratedValue
-    var id: Int = 0
+    open var id: Int = 0
 
     @Column
-    var topic: String? = null
+    open var topic: String? = null
 
     @Column
-    var tags: HashSet<String>? = null
+    @ElementCollection(targetClass = String::class)
+    open var tags: MutableSet<String>? = null
 
     @Column
-    var isPrivate: Boolean = true
+    open var isPrivate: Boolean = true
 
     @JoinColumn(nullable = false)
     @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
     @LazyCollection(LazyCollectionOption.EXTRA)
-    var cards: MutableList<Card> = mutableListOf()
-
-    @CreationTimestamp
-    val creationDate: Instant = Instant.now()
-
-    @UpdateTimestamp
-    var updateDate: Instant = Instant.now()
+    @OrderBy("orderNum")
+    open lateinit var cards: MutableList<Card<*>>
 
     @Column
-    var removed: Boolean = false
+    open var cardsCount: Int = 0
+
+    @CreationTimestamp
+    open lateinit var creationDate: Instant
+
+    @UpdateTimestamp
+    open lateinit var updateDate: Instant
+
+    @Column
+    open var removed: Boolean = false
+
+    fun addCard(card: Card<*>) {
+        cards.add(card)
+        cardsCount++
+    }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

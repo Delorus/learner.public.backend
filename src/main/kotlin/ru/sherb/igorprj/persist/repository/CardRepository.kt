@@ -7,4 +7,4 @@ import ru.sherb.igorprj.persist.entity.Card
  * @author maksim
  * @since 28.08.2019
  */
-interface CardRepository : PagingAndSortingRepository<Card, Int>
+interface CardRepository : PagingAndSortingRepository<Card<*>, Int>

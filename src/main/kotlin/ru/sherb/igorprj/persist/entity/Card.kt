@@ -6,14 +6,25 @@ import org.hibernate.annotations.CreationTimestamp
 import org.hibernate.annotations.SQLDelete
 import org.hibernate.annotations.UpdateTimestamp
 import org.hibernate.annotations.Where
+import org.hibernate.engine.jdbc.BlobProxy
+import org.springframework.util.unit.DataSize
+import java.io.InputStream
+import java.io.InputStreamReader
+import java.net.URI
+import java.nio.charset.StandardCharsets
+import java.sql.Blob
 import java.time.Instant
+import javax.persistence.Basic
 import javax.persistence.CascadeType
 import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.FetchType
 import javax.persistence.GeneratedValue
 import javax.persistence.Id
+import javax.persistence.Inheritance
+import javax.persistence.InheritanceType
 import javax.persistence.JoinColumn
+import javax.persistence.Lob
 import javax.persistence.OneToMany
 
 /**
@@ -24,36 +35,41 @@ import javax.persistence.OneToMany
 @Where(clause = "removed = false")
 @SQLDelete(sql = "update card set removed = true where id = ?")
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
-open class Card {
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+abstract class Card<T> {
 
     @Id
     @GeneratedValue
-    var id: Int = 0
+    open var id: Int = 0
 
     @Column(nullable = false)
-    var subject: String = ""
+    open var orderNum: Int = 0
 
-    @Column
-    var content: String? = null
+    @Column(nullable = false)
+    open lateinit var subject: String
 
     @JoinColumn(nullable = false)
     @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.EAGER)
-    var answers: MutableList<Answer> = mutableListOf()
+    open lateinit var answers: MutableList<Answer>
 
     @CreationTimestamp
-    val creationDate: Instant = Instant.now()
+    open lateinit var creationDate: Instant
 
     @UpdateTimestamp
-    var updateDate: Instant = Instant.now()
+    open lateinit var updateDate: Instant
 
     @Column
-    var removed: Boolean = false
+    open var removed: Boolean = false
+
+    abstract fun loadContent(): T
+
+    abstract fun saveContent(input: InputStream)
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
-        other as Card
+        other as Card<*>
 
         if (id != other.id) return false
 
@@ -61,4 +77,48 @@ open class Card {
     }
 
     override fun hashCode() = id
+}
+
+@Entity
+open class TextCard : Card<String>() {
+
+    @Column
+    private lateinit var text: String
+
+    override fun loadContent() = text
+
+    override fun saveContent(input: InputStream) {
+        InputStreamReader(input, StandardCharsets.UTF_8).use {
+            text = it.readText()
+        }
+    }
+}
+
+@Entity
+open class MultimediaCard : Card<InputStream>() {
+
+    @Lob
+    @Column
+    @Basic(fetch = FetchType.LAZY)
+    private lateinit var data: Blob
+
+    override fun loadContent(): InputStream = data.binaryStream
+
+    override fun saveContent(input: InputStream) {
+        data = BlobProxy.generateProxy(input, DataSize.ofMegabytes(10).toBytes())
+    }
+}
+
+open class ExternalCard : Card<URI>() {
+
+    @Column
+    private lateinit var link: URI
+
+    override fun loadContent(): URI {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun saveContent(input: InputStream) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
 }
