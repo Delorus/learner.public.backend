@@ -9,4 +9,7 @@ import kotlin.reflect.KClass
  * @since 28.08.2019
  */
 @ResponseStatus(HttpStatus.NOT_FOUND)
-class ResourceNotFoundException(val entity: KClass<*>, val id: Int) : Exception("Entity [${entity.simpleName}] with id = $id not found")
+class ResourceNotFoundException : RuntimeException {
+
+    constructor(entity: KClass<*>, id: Int): super("Entity [${entity.simpleName}] with id = $id not found")
+}
