@@ -61,7 +61,7 @@ class CardGroupEndpoint(
     @GetMapping("{id}")
     fun getById(@PathVariable id: Int,
                 @RequestParam(required = false, defaultValue = "4") fetchCard: Int): CardGroupView
-            = cardGroupRepository.findById(id)
+            = cardGroupRepository.findById(id) //fixme inefficient loading from db
                 .map { CardGroupView(it, fetchCard) }
                 .orElseThrow { ResourceNotFoundException(CardGroup::class, id) }
 
@@ -101,16 +101,7 @@ class CardGroupEndpoint(
             throw ResourceNotFoundException(CardGroup::class, id)
         }
 
-        val page = cardRepository.findAll(PageRequest.of(offset, limit)).map { card ->
-            val view = CardView(card)
-            if (card is TextCard) {
-                view.content = card.loadContent()
-            } else {
-                view.contentLocation = buildLocation(card.id, addPath = "content").toASCIIString()
-            }
-
-            return@map view
-        }
+        val page = cardRepository.findAll(PageRequest.of(offset, limit)).map(::cardViewOf)
         return ResponseEntity.ok(page)
     }
 

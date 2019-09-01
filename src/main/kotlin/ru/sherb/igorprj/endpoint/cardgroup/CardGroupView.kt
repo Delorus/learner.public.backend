@@ -37,4 +37,5 @@ data class CardGroupView(
 
 private fun fetchCardsFrom(group: CardGroup, cardsLimit: Int) = group.cards
         .take(cardsLimit)
-        .map(::CardView)
+        .map(::cardViewOf)
+

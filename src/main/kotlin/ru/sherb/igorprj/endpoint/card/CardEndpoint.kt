@@ -2,6 +2,7 @@ package ru.sherb.igorprj.endpoint.card
 
 import org.springframework.http.ResponseEntity
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
@@ -33,5 +34,10 @@ class CardEndpoint(
         card.subject = subject
 
         return ResponseEntity.ok().build()
+    }
+
+    @GetMapping("{id}/content")
+    fun loadContent(@PathVariable id: Int) {
+        TODO()
     }
 }

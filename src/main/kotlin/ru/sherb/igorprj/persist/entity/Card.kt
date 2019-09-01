@@ -10,7 +10,6 @@ import org.hibernate.engine.jdbc.BlobProxy
 import org.springframework.util.unit.DataSize
 import java.io.InputStream
 import java.io.InputStreamReader
-import java.net.URI
 import java.nio.charset.StandardCharsets
 import java.sql.Blob
 import java.time.Instant
@@ -109,16 +108,16 @@ open class MultimediaCard : Card<InputStream>() {
     }
 }
 
-open class ExternalCard : Card<URI>() {
+open class ExternalCard : Card<String>() {
 
     @Column
-    private lateinit var link: URI
+    private lateinit var link: String
 
-    override fun loadContent(): URI {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
+    override fun loadContent() = link
 
     override fun saveContent(input: InputStream) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        InputStreamReader(input, StandardCharsets.UTF_8).use {
+            link = it.readText()
+        }
     }
 }
