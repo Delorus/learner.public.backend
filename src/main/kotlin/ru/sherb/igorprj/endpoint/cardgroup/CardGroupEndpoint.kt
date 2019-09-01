@@ -15,6 +15,14 @@ import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 import ru.sherb.igorprj.endpoint.ResourceNotFoundException
+import ru.sherb.igorprj.endpoint.cardgroup.view.CardGroupListView
+import ru.sherb.igorprj.endpoint.cardgroup.view.CardGroupView
+import ru.sherb.igorprj.endpoint.cardgroup.view.CardView
+import ru.sherb.igorprj.endpoint.cardgroup.view.ContentType
+import ru.sherb.igorprj.endpoint.cardgroup.view.NewAnswer
+import ru.sherb.igorprj.endpoint.cardgroup.view.NewCard
+import ru.sherb.igorprj.endpoint.cardgroup.view.NewCardGroup
+import ru.sherb.igorprj.endpoint.cardgroup.view.cardViewOf
 import ru.sherb.igorprj.persist.entity.Answer
 import ru.sherb.igorprj.persist.entity.Card
 import ru.sherb.igorprj.persist.entity.CardGroup

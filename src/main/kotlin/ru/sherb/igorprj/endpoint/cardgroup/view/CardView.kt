@@ -1,4 +1,4 @@
-package ru.sherb.igorprj.endpoint.cardgroup
+package ru.sherb.igorprj.endpoint.cardgroup.view
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include

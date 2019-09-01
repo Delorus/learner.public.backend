@@ -1,4 +1,4 @@
-package ru.sherb.igorprj.endpoint.cardgroup
+package ru.sherb.igorprj.endpoint.cardgroup.view
 
 import ru.sherb.igorprj.persist.entity.CardGroup
 
