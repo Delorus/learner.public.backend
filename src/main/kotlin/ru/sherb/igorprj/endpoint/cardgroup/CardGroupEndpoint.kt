@@ -69,7 +69,7 @@ class CardGroupEndpoint(
     @GetMapping("{id}")
     fun getById(@PathVariable id: Int,
                 @RequestParam(required = false, defaultValue = "4") fetchCard: Int): CardGroupView
-            = cardGroupRepository.findById(id) //fixme inefficient loading from db
+            = cardGroupRepository.findById(id) //fixme inefficient loading from db (one request = one card instead of one per all)
                 .map { CardGroupView(it, fetchCard) }
                 .orElseThrow { ResourceNotFoundException(CardGroup::class, id) }
 

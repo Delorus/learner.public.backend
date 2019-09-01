@@ -35,7 +35,7 @@ import javax.persistence.OneToMany
 @SQLDelete(sql = "update card set removed = true where id = ?")
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-abstract class Card<T> {
+sealed class Card<T> {
 
     @Id
     @GeneratedValue
@@ -100,6 +100,8 @@ open class MultimediaCard : Card<InputStream>() {
     @Column
     @Basic(fetch = FetchType.LAZY)
     private lateinit var data: Blob
+
+    //todo add content type and content size
 
     override fun loadContent(): InputStream = data.binaryStream
 
