@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder
+import org.springframework.web.bind.annotation.RequestMethod
+
 import ru.sherb.igorprj.endpoint.ResourceNotFoundException
 import ru.sherb.igorprj.endpoint.cardgroup.view.CardGroupListView
 import ru.sherb.igorprj.endpoint.cardgroup.view.CardGroupView
@@ -40,14 +42,13 @@ import ru.sherb.igorprj.persist.repository.CardRepository
  * @since 27.08.2019
  */
 @RestController
-@RequestMapping("v1/packs", consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
+@RequestMapping("v1/packs", consumes = [MediaType.ALL_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
 class CardGroupEndpoint(
         val cardGroupSearchStatisticRepository: CardGroupSearchStatisticRepository,
         val cardGroupRepository: CardGroupRepository,
         val answerRepository: AnswerRepository,
         val cardRepository: CardRepository
 ) {
-
     @GetMapping
     @Transactional
     fun getPage(@RequestParam(required = false) query: String?, //fixme ignoring query param
