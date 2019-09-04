@@ -11,8 +11,10 @@ import javax.persistence.Entity
 import javax.persistence.FetchType
 import javax.persistence.GeneratedValue
 import javax.persistence.Id
+import javax.persistence.Index
 import javax.persistence.JoinColumn
 import javax.persistence.OneToMany
+import javax.persistence.Table
 import javax.validation.constraints.Email
 
 /**
@@ -22,6 +24,7 @@ import javax.validation.constraints.Email
 @Entity
 @Where(clause = "removed = false") //todo add data cleaner scheduling task
 @SQLDelete(sql = "update app_user set removed = true where id = ?")
+@Table(indexes = [Index(columnList = "email", unique = true)])
 open class AppUser {
 
     @Id
@@ -29,7 +32,7 @@ open class AppUser {
     open var id: Int = 0
 
     @Email
-    @Column
+    @Column(unique = true)
     @NaturalId
     open var email: String? = null
 
