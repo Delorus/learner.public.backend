@@ -11,5 +11,7 @@ import org.springframework.web.bind.annotation.ResponseStatus
 @ResponseStatus(HttpStatus.FORBIDDEN)
 class AuthenticationException : RuntimeException {
 
+    constructor(email: String) : super("incorrect email or code for user [$email]")
+
     constructor(email: String, cause: GoogleAuthenticatorException) : super("incorrect email or code for user [$email]", cause)
 }

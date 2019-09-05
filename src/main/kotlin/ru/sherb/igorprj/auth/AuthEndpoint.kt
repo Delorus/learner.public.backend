@@ -38,7 +38,9 @@ class AuthEndpoint(
         val secret = otpStorage[authRequest.email]
         val gAuth = GoogleAuthenticator()
         try {
-            gAuth.authorize(secret, authRequest.code.toInt())
+            if (secret == null || !gAuth.authorize(secret, authRequest.code.toInt())) {
+                throw AuthenticationException(authRequest.email)
+            }
         } catch (e: GoogleAuthenticatorException) {
             throw AuthenticationException(authRequest.email, e)
         }
@@ -57,13 +59,17 @@ class AuthEndpoint(
     }
 
     @PostMapping("/sendCode")
-    fun sendCode(@Valid @Email @NotBlank @RequestBody email: String) {
+    fun sendCode(@Valid @Email @NotBlank @RequestBody email: String): ResponseEntity<DebugCodeResponse> {
         val gAuth = GoogleAuthenticator()
         val key = gAuth.createCredentials()
         otpStorage[email] = key.key
-        log.warn("AUTHORISATION CODE: ${key.verificationCode}")
+        val code = gAuth.getTotpPassword(key.key)
+        log.warn("AUTHORISATION CODE: $code")
+        return ResponseEntity.ok(DebugCodeResponse(code))
     }
 }
+
+data class DebugCodeResponse(val code: Int)
 
 /**
  * Object to return as body in JWT Authentication.
