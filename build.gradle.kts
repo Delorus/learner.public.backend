@@ -38,6 +38,7 @@ dependencies {
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.10.7")
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.10.7")
     testImplementation("org.springframework.security:spring-security-test")
+    implementation("com.warrenstrange:googleauth:1.1.2")
 }
 
 tasks.withType<KotlinCompile> {
