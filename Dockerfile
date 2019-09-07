@@ -5,7 +5,6 @@ COPY gradle gradle
 RUN ./gradlew -Dorg.gradle.daemon=false dependencies
 
 COPY src src
-RUN ./gradlew --version
 RUN ./gradlew bootJar
 
 FROM openjdk:11-jre-slim
