@@ -54,6 +54,7 @@ class AuthEndpoint(
 
         val authentication = UsernamePasswordAuthenticationToken(user.email, "")
         SecurityContextHolder.getContext().authentication = authentication
+
         val jwt = tokenProvider.createToken(authentication)
         return ResponseEntity.ok(JWTToken(jwt))
     }

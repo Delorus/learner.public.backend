@@ -10,7 +10,7 @@ import java.util.concurrent.ConcurrentHashMap
 @Component
 class OtpStorage {
 
-    private val emailToCode: MutableMap<String, String> = ConcurrentHashMap() //todo set exired date
+    private val emailToCode: MutableMap<String, String> = ConcurrentHashMap() //todo set expired date
 
     operator fun get(email: String) = emailToCode[email]
 

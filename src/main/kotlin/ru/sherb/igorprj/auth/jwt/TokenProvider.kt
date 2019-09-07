@@ -23,14 +23,29 @@ class TokenProvider {
     @Value("\${learner.jwt.expiredTime}")
     private lateinit var expiredTime: Duration
 
+    @Value("\${learner.security.admin_email}")
+    private lateinit var superEmail: String
+
+    fun createSuperToken(): String {
+        return Jwts.builder()
+                .setSubject(superEmail)
+                .claim(AUTHORITIES_KEY, "ROLE_ADMIN")
+                .signWith(key, SignatureAlgorithm.HS512)
+                .compact()
+    }
+
     fun createToken(authentication: Authentication): String {
+        if (authentication.name == superEmail) {
+            return createSuperToken()
+        }
+
         val authorities = authentication.authorities.joinToString { it.authority }
 
         val validity = Instant.now().plus(expiredTime)
 
         return Jwts.builder()
                 .setSubject(authentication.name)
-                .claim(AUTHORITIES_KEY, authorities)
+                .claim(AUTHORITIES_KEY, arrayOf(authorities, "ROLE_USER").joinToString())
                 .signWith(key, SignatureAlgorithm.HS512)
                 .setExpiration(Date.from(validity))
                 .compact()
