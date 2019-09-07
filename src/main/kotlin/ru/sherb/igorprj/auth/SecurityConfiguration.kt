@@ -49,7 +49,11 @@ class SecurityConfiguration(
             .and().authorizeRequests()
                 .antMatchers("/v1/auth").permitAll()
                 .antMatchers("/v1/sendCode").permitAll()
-                .antMatchers("/swagger-ui.html").permitAll()
+                .antMatchers("/swagger-ui.html",
+                             "/v2/api-docs",
+                             "/webjars/**",
+                             "/swagger-resources/**",
+                             "/actuator/**").permitAll()
                 .anyRequest().authenticated()
             .and()
                 .apply<SecurityConfigurerAdapter<DefaultSecurityFilterChain, HttpSecurity>>(securityConfigurerAdapter())
