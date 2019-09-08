@@ -7,6 +7,7 @@ import org.hibernate.annotations.SQLDelete
 import org.hibernate.annotations.UpdateTimestamp
 import org.hibernate.annotations.Where
 import org.hibernate.engine.jdbc.BlobProxy
+import org.hibernate.search.annotations.Field
 import org.springframework.util.unit.DataSize
 import java.io.InputStream
 import java.io.InputStreamReader
@@ -31,6 +32,7 @@ import javax.persistence.OneToMany
  * @since 26.08.2019
  */
 @Entity
+//@Indexed
 @Where(clause = "removed = false")
 @SQLDelete(sql = "update card set removed = true where id = ?")
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
@@ -44,6 +46,7 @@ sealed class Card<T> {
     @Column(nullable = false)
     open var orderNum: Int = 0
 
+    @Field
     @Column(nullable = false)
     open lateinit var subject: String
 
@@ -79,8 +82,10 @@ sealed class Card<T> {
 }
 
 @Entity
+//@Indexed
 open class TextCard : Card<String>() {
 
+    @Field
     @Column
     private lateinit var text: String
 

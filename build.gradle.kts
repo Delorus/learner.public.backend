@@ -39,6 +39,8 @@ dependencies {
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.10.7")
     testImplementation("org.springframework.security:spring-security-test")
     implementation("com.warrenstrange:googleauth:1.1.2")
+
+    implementation("org.hibernate:hibernate-search-orm:5.11.2.Final")
 }
 
 tasks.withType<KotlinCompile> {

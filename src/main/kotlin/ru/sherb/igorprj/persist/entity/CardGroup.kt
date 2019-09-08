@@ -6,6 +6,9 @@ import org.hibernate.annotations.LazyCollectionOption
 import org.hibernate.annotations.SQLDelete
 import org.hibernate.annotations.UpdateTimestamp
 import org.hibernate.annotations.Where
+import org.hibernate.search.annotations.Field
+import org.hibernate.search.annotations.Indexed
+import org.hibernate.search.annotations.IndexedEmbedded
 import java.time.Instant
 import javax.persistence.CascadeType
 import javax.persistence.Column
@@ -23,6 +26,7 @@ import javax.persistence.OrderBy
  * @since 26.08.2019
  */
 @Entity
+@Indexed
 @Where(clause = "removed = false")
 @SQLDelete(sql = "update card_group set removed = true where id = ?")
 open class CardGroup {
@@ -31,6 +35,7 @@ open class CardGroup {
     @GeneratedValue
     open var id: Int = 0
 
+    @Field
     @Column
     open var topic: String? = null
 
@@ -43,6 +48,7 @@ open class CardGroup {
 
     // not null, but there are some cards in the "building" status
     // todo clean building cards after some time
+    @IndexedEmbedded
     @JoinColumn
     @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true, fetch = FetchType.LAZY)
     @LazyCollection(LazyCollectionOption.EXTRA)
