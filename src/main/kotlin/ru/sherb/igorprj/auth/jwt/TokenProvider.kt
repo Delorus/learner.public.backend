@@ -4,6 +4,7 @@ import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.MalformedJwtException
 import io.jsonwebtoken.SignatureAlgorithm
 import io.jsonwebtoken.security.Keys
+import io.jsonwebtoken.security.SignatureException
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
@@ -71,7 +72,7 @@ class TokenProvider {
     fun validateToken(authToken: String) = try {
         Jwts.parser().setSigningKey(key).parseClaimsJws(authToken)
         true
-    } catch (e: SecurityException) { false } catch (e: MalformedJwtException) { false }
+    } catch (e: SecurityException) { false } catch (e: MalformedJwtException) { false } catch (e: SignatureException) { false }
 
     companion object {
         private const val AUTHORITIES_KEY = "auth"
