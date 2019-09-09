@@ -38,7 +38,7 @@ open class AppUser {
 
     @JoinColumn
     @OneToMany(fetch = FetchType.LAZY)
-    open var groups: MutableList<CardGroup>? = null
+    open lateinit var groups: MutableList<CardGroup>
 
     @CreationTimestamp
     open lateinit var creationDate: Instant
@@ -48,6 +48,10 @@ open class AppUser {
 
     @Column
     open var removed: Boolean = false
+
+    fun addCardGroup(cardGroup: CardGroup) {
+        groups.add(cardGroup)
+    }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

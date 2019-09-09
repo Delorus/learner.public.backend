@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 import ru.sherb.igorprj.endpoint.ResourceNotFoundException
+import ru.sherb.igorprj.endpoint.UserNotFoundException
 import ru.sherb.igorprj.endpoint.cardgroup.view.CardGroupListView
 import ru.sherb.igorprj.endpoint.cardgroup.view.CardGroupView
 import ru.sherb.igorprj.endpoint.cardgroup.view.CardView
@@ -25,6 +26,7 @@ import ru.sherb.igorprj.endpoint.cardgroup.view.NewCard
 import ru.sherb.igorprj.endpoint.cardgroup.view.NewCardGroup
 import ru.sherb.igorprj.endpoint.cardgroup.view.cardViewOf
 import ru.sherb.igorprj.persist.entity.Answer
+import ru.sherb.igorprj.persist.entity.AppUser
 import ru.sherb.igorprj.persist.entity.Card
 import ru.sherb.igorprj.persist.entity.CardGroup
 import ru.sherb.igorprj.persist.entity.CardGroupSearchStatistic
@@ -32,10 +34,12 @@ import ru.sherb.igorprj.persist.entity.ExternalCard
 import ru.sherb.igorprj.persist.entity.MultimediaCard
 import ru.sherb.igorprj.persist.entity.TextCard
 import ru.sherb.igorprj.persist.repository.AnswerRepository
+import ru.sherb.igorprj.persist.repository.AppUserRepository
 import ru.sherb.igorprj.persist.repository.CardGroupRepository
 import ru.sherb.igorprj.persist.repository.CardGroupSearchStatisticRepository
 import ru.sherb.igorprj.persist.repository.CardRepository
 import ru.sherb.igorprj.search.CardGroupSearchService
+import java.security.Principal
 
 /**
  * @author maksim
@@ -48,7 +52,8 @@ class CardGroupEndpoint(
         val cardGroupRepository: CardGroupRepository,
         val answerRepository: AnswerRepository,
         val cardRepository: CardRepository,
-        val cardGroupSearch: CardGroupSearchService
+        val cardGroupSearch: CardGroupSearchService,
+        val userRepository: AppUserRepository
 ) {
     @GetMapping
     @Transactional
@@ -83,8 +88,12 @@ class CardGroupEndpoint(
 
     //todo bind to current user (get from credentials)
     @PostMapping
-    fun create(@RequestBody newCardGroup: NewCardGroup): ResponseEntity<Any> {
-        val cardGroup = createCardGroup(newCardGroup)
+    @Transactional
+    fun create(principal: Principal, @RequestBody newCardGroup: NewCardGroup): ResponseEntity<Any> {
+        val user = userRepository.findByEmail(principal.name)
+                .orElseThrow { UserNotFoundException(principal.name) }
+
+        val cardGroup = createCardGroup(user, newCardGroup)
 
         return ResponseEntity.created(buildLocation(cardGroup.id)).build()
     }
@@ -142,9 +151,11 @@ class CardGroupEndpoint(
         }
     }.onEach { answerRepository.save(it) }.onEach { parent.answers.add(it) }.toMutableList()
 
-    private fun createCardGroup(newCardGroup: NewCardGroup): CardGroup {
+    private fun createCardGroup(user: AppUser, newCardGroup: NewCardGroup): CardGroup {
         val cardGroup = CardGroup()
         cardGroup.topic = newCardGroup.topic
+
+        user.addCardGroup(cardGroup)
 
         return cardGroupRepository.save(cardGroup)
     }
