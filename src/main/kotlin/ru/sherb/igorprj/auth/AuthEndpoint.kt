@@ -34,7 +34,7 @@ class AuthEndpoint(
     private val log = LoggerFactory.getLogger(this::class.java)
 
     @PostMapping("/auth")
-    fun auth(@Valid @RequestBody authRequest: AuthRequest): ResponseEntity<JWTToken> {
+    fun auth(@Valid @RequestBody authRequest: AuthRequest): ResponseEntity<AuthResponse> {
         val secret = otpStorage[authRequest.email]
         val gAuth = GoogleAuthenticator()
         try {
@@ -56,7 +56,7 @@ class AuthEndpoint(
         SecurityContextHolder.getContext().authentication = authentication
 
         val jwt = tokenProvider.createToken(authentication)
-        return ResponseEntity.ok(JWTToken(jwt))
+        return ResponseEntity.ok(AuthResponse(jwt, user.id))
     }
 
     @PostMapping("/sendCode")
@@ -75,7 +75,7 @@ data class DebugCodeResponse(val code: Int)
 /**
  * Object to return as body in JWT Authentication.
  */
-data class JWTToken(val token: String)
+data class AuthResponse(val token: String, val userId: Int)
 
 data class AuthRequest(
         @Email

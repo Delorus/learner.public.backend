@@ -57,7 +57,7 @@ class CardGroupEndpoint(
 ) {
     @GetMapping
     @Transactional
-    fun getPage(@RequestParam(required = false) query: String?, //fixme ignoring query param
+    fun getPage(@RequestParam(required = false) query: String?,
                 @RequestParam offset: Int,
                 @RequestParam limit: Int): Page<CardGroupListView> {
 
