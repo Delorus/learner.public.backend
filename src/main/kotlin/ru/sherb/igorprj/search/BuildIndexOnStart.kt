@@ -22,5 +22,7 @@ class BuildIndexOnStart: ApplicationListener<ApplicationReadyEvent> {
     override fun onApplicationEvent(event: ApplicationReadyEvent) {
         val fullTextEntityManager = Search.getFullTextEntityManager(entityManager)
         fullTextEntityManager.createIndexer().startAndWait()
+
+        System.gc()
     }
 }

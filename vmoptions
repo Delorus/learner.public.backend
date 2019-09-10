@@ -1,5 +1,3 @@
--Xms10m
--Xmx400m
 -XX:+UseG1GC
 -XX:+UseStringDeduplication
 -XX:+UseContainerSupport
