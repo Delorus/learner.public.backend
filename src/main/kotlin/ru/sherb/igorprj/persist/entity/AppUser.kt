@@ -15,7 +15,6 @@ import javax.persistence.Index
 import javax.persistence.JoinColumn
 import javax.persistence.OneToMany
 import javax.persistence.Table
-import javax.validation.constraints.Email
 
 /**
  * @author maksim
@@ -31,7 +30,6 @@ open class AppUser {
     @GeneratedValue
     open var id: Int = 0
 
-    @Email
     @Column(unique = true)
     @NaturalId
     open var email: String? = null
