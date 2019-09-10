@@ -1,6 +1,5 @@
 package ru.sherb.igorprj.endpoint.userinfo
 
-import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.GetMapping
@@ -8,6 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import ru.sherb.igorprj.endpoint.PageView
 import ru.sherb.igorprj.endpoint.ResourceNotFoundException
 import ru.sherb.igorprj.endpoint.cardgroup.view.CardGroupListView
 import ru.sherb.igorprj.persist.entity.AppUser
@@ -29,12 +29,12 @@ class UserInfoEndpoint(
     @Transactional(readOnly = true)
     fun getUserPacks(@PathVariable id: Int,
                      @RequestParam offset: Int,
-                     @RequestParam limit: Int): Page<CardGroupListView> {
+                     @RequestParam limit: Int): PageView<CardGroupListView> {
 
         val user = userRepository.findById(id)
                 .orElseThrow { ResourceNotFoundException(AppUser::class, id) }
 
-        return cardGroupRepository.findByUser(user, PageRequest.of(offset, limit))
-                .map(::CardGroupListView)
+        return PageView(cardGroupRepository.findByUser(user, PageRequest.of(offset, limit))
+                .map(::CardGroupListView))
     }
 }

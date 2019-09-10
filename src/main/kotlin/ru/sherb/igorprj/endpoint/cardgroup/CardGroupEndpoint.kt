@@ -1,6 +1,5 @@
 package ru.sherb.igorprj.endpoint.cardgroup
 
-import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import org.springframework.http.MediaType
@@ -15,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder
+import ru.sherb.igorprj.endpoint.PageView
 import ru.sherb.igorprj.endpoint.ResourceNotFoundException
 import ru.sherb.igorprj.endpoint.UserNotFoundException
 import ru.sherb.igorprj.endpoint.cardgroup.view.CardGroupListView
@@ -59,7 +59,7 @@ class CardGroupEndpoint(
     @Transactional
     fun getPage(@RequestParam(required = false) query: String?,
                 @RequestParam offset: Int,
-                @RequestParam limit: Int): Page<CardGroupListView> {
+                @RequestParam limit: Int): PageView<CardGroupListView> {
 
         query?.also {
             val updated = cardGroupSearchStatisticRepository.incNumOfQueryRequest(it)
@@ -71,9 +71,9 @@ class CardGroupEndpoint(
         }
 
         return if (query != null) {
-            PageImpl(cardGroupSearch.search(query).map(::CardGroupListView), PageRequest.of(offset, limit), limit.toLong())
+            PageView(PageImpl(cardGroupSearch.search(query).map(::CardGroupListView), PageRequest.of(offset, limit), limit.toLong()))
         } else {
-            cardGroupRepository.findAll(PageRequest.of(offset, limit)).map(::CardGroupListView)
+            PageView(cardGroupRepository.findAll(PageRequest.of(offset, limit)).map(::CardGroupListView))
         }
     }
 
@@ -116,7 +116,7 @@ class CardGroupEndpoint(
     @GetMapping("{id}/cards")
     fun getCards(@PathVariable id: Int,
                  @RequestParam offset: Int,
-                 @RequestParam limit: Int): ResponseEntity<Page<CardView>> {
+                 @RequestParam limit: Int): PageView<CardView> {
 
         val maybeCardGroup = cardGroupRepository.findById(id)
 
@@ -125,7 +125,7 @@ class CardGroupEndpoint(
         }
 
         val page = cardRepository.findAll(PageRequest.of(offset, limit)).map(::cardViewOf)
-        return ResponseEntity.ok(page)
+        return PageView(page)
     }
 
     private fun createCard(group: CardGroup, newCard: NewCard): Card<*> {
