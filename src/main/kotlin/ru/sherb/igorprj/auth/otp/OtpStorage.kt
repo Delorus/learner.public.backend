@@ -15,7 +15,7 @@ class OtpStorage {
     operator fun get(email: String) = emailToCode[email]
 
     operator fun set(email: String, code: String) {
-        emailToCode[email] = code.trim()
+        emailToCode[email.trim()] = code
     }
 
     fun remove(email: String) = emailToCode.remove(email)
