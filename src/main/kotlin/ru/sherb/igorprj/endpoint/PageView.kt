@@ -13,3 +13,5 @@ data class PageView<T>(
 ) {
     constructor(page: Page<T>): this(page.content, page.hasNext(), page.hasNext())
 }
+
+fun <T> emptyPageView() = PageView<T>(emptyList(), false, false)

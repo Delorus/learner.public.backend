@@ -27,6 +27,8 @@ class UserInfoEndpoint(
         val cardGroupRepository: CardGroupRepository
 ) {
 
+    private val log = LoggerFactory.getLogger(UserInfoEndpoint::class.java)
+
     @GetMapping("{id}/packs")
     @Transactional(readOnly = true)
     fun getUserPacks(@PathVariable id: Int,
@@ -36,7 +38,12 @@ class UserInfoEndpoint(
         val user = userRepository.findById(id)
                 .orElseThrow { ResourceNotFoundException(AppUser::class, id) }
 
-        return PageView(cardGroupRepository.findByUser(user, PageRequest.of(offset, limit))
-                .map(::CardGroupListView))
+        return try {
+            PageView(cardGroupRepository.findByUser(user, PageRequest.of(offset, limit))
+                    .map(::CardGroupListView))
+        } catch (e: Exception) {
+            log.error(e.message, e)
+            emptyPageView()
+        }
     }
 }

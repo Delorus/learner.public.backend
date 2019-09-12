@@ -57,6 +57,9 @@ class CardGroupEndpoint(
         val cardGroupSearch: CardGroupSearchService,
         val userRepository: AppUserRepository
 ) {
+
+    private val log = LoggerFactory.getLogger(CardGroupEndpoint::class.java)
+
     @GetMapping
     @Transactional
     fun getPage(@RequestParam(required = false) query: String?,
@@ -72,10 +75,15 @@ class CardGroupEndpoint(
             }
         }
 
-        return if (query != null) {
-            PageView(PageImpl(cardGroupSearch.search(query).map(::CardGroupListView), PageRequest.of(offset, limit), limit.toLong()))
-        } else {
-            PageView(cardGroupRepository.findAll(PageRequest.of(offset, limit)).map(::CardGroupListView))
+        return try {
+            if (query != null) {
+                PageView(PageImpl(cardGroupSearch.search(query).map(::CardGroupListView), PageRequest.of(offset, limit), limit.toLong()))
+            } else {
+                PageView(cardGroupRepository.findAll(PageRequest.of(offset, limit)).map(::CardGroupListView))
+            }
+        } catch (e: Exception) {
+            log.error(e.message, e)
+            emptyPageView()
         }
     }
 
@@ -126,8 +134,13 @@ class CardGroupEndpoint(
             throw ResourceNotFoundException(CardGroup::class, id)
         }
 
-        val page = cardRepository.findAll(PageRequest.of(offset, limit)).map(::cardViewOf)
-        return PageView(page)
+        return try {
+            val page = cardRepository.findAll(PageRequest.of(offset, limit)).map(::cardViewOf)
+            PageView(page)
+        } catch (e: Exception) {
+            log.error(e.message, e)
+            emptyPageView()
+        }
     }
 
     private fun createCard(group: CardGroup, newCard: NewCard): Card<*> {
