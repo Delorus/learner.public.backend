@@ -44,6 +44,7 @@ class AuthEndpoint(
         } catch (e: GoogleAuthenticatorException) {
             throw AuthenticationException(authRequest.email, e)
         }
+        otpStorage.remove(authRequest.email)
 
         val user = userRepository.findByEmail(authRequest.email).orElseGet {
             val user = AppUser().apply {
