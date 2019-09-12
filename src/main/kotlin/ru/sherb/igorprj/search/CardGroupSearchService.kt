@@ -29,7 +29,7 @@ class CardGroupSearchService {
                 .forEntity(CardGroup::class.java)
                 .get()
 
-        val query = builder.keyword()
+        val query = builder.simpleQueryString()
                 .onFields("topic", "cards.subject"/*, "cards.text"*/)
                 .matching(text)
                 .createQuery()
