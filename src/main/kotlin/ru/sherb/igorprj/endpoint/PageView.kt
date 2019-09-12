@@ -11,7 +11,7 @@ data class PageView<T>(
         val hasNext: Boolean,
         val hasPrev: Boolean
 ) {
-    constructor(page: Page<T>): this(page.content, page.hasNext(), page.hasNext())
+    constructor(page: Page<T>): this(page.content, page.hasNext(), page.hasPrevious())
 }
 
 fun <T> emptyPageView() = PageView<T>(emptyList(), false, false)

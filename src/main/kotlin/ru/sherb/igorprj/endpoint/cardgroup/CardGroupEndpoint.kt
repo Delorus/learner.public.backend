@@ -1,7 +1,6 @@
 package ru.sherb.igorprj.endpoint.cardgroup
 
 import org.slf4j.LoggerFactory
-import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
@@ -77,7 +76,7 @@ class CardGroupEndpoint(
 
         return try {
             if (query != null) {
-                PageView(PageImpl(cardGroupSearch.search(query).map(::CardGroupListView), PageRequest.of(offset, limit), limit.toLong()))
+                PageView(cardGroupSearch.search(query, PageRequest.of(offset, limit)).map(::CardGroupListView))
             } else {
                 PageView(cardGroupRepository.findAll(PageRequest.of(offset, limit)).map(::CardGroupListView))
             }
