@@ -1,5 +1,6 @@
 package ru.sherb.igorprj.endpoint.cardgroup
 
+import org.slf4j.LoggerFactory
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.PageRequest
 import org.springframework.http.MediaType
@@ -25,6 +26,7 @@ import ru.sherb.igorprj.endpoint.cardgroup.view.NewAnswer
 import ru.sherb.igorprj.endpoint.cardgroup.view.NewCard
 import ru.sherb.igorprj.endpoint.cardgroup.view.NewCardGroup
 import ru.sherb.igorprj.endpoint.cardgroup.view.cardViewOf
+import ru.sherb.igorprj.endpoint.emptyPageView
 import ru.sherb.igorprj.persist.entity.Answer
 import ru.sherb.igorprj.persist.entity.AppUser
 import ru.sherb.igorprj.persist.entity.Card
@@ -58,8 +60,8 @@ class CardGroupEndpoint(
     @GetMapping
     @Transactional
     fun getPage(@RequestParam(required = false) query: String?,
-                @RequestParam offset: Int,
-                @RequestParam limit: Int): PageView<CardGroupListView> {
+                @RequestParam(required = false, defaultValue = "0") offset: Int,
+                @RequestParam(required = false, defaultValue = "10") limit: Int): PageView<CardGroupListView> {
 
         query?.also {
             val updated = cardGroupSearchStatisticRepository.incNumOfQueryRequest(it)
@@ -115,8 +117,8 @@ class CardGroupEndpoint(
 
     @GetMapping("{id}/cards")
     fun getCards(@PathVariable id: Int,
-                 @RequestParam offset: Int,
-                 @RequestParam limit: Int): PageView<CardView> {
+                 @RequestParam(required = false, defaultValue = "0") offset: Int,
+                 @RequestParam(required = false, defaultValue = "10") limit: Int): PageView<CardView> {
 
         val maybeCardGroup = cardGroupRepository.findById(id)
 

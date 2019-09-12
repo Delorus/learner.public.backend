@@ -1,5 +1,6 @@
 package ru.sherb.igorprj.endpoint.userinfo
 
+import org.slf4j.LoggerFactory
 import org.springframework.data.domain.PageRequest
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.GetMapping
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController
 import ru.sherb.igorprj.endpoint.PageView
 import ru.sherb.igorprj.endpoint.ResourceNotFoundException
 import ru.sherb.igorprj.endpoint.cardgroup.view.CardGroupListView
+import ru.sherb.igorprj.endpoint.emptyPageView
 import ru.sherb.igorprj.persist.entity.AppUser
 import ru.sherb.igorprj.persist.repository.AppUserRepository
 import ru.sherb.igorprj.persist.repository.CardGroupRepository
@@ -28,8 +30,8 @@ class UserInfoEndpoint(
     @GetMapping("{id}/packs")
     @Transactional(readOnly = true)
     fun getUserPacks(@PathVariable id: Int,
-                     @RequestParam offset: Int,
-                     @RequestParam limit: Int): PageView<CardGroupListView> {
+                     @RequestParam(required = false, defaultValue = "0") offset: Int,
+                     @RequestParam(required = false, defaultValue = "10") limit: Int): PageView<CardGroupListView> {
 
         val user = userRepository.findById(id)
                 .orElseThrow { ResourceNotFoundException(AppUser::class, id) }

@@ -31,13 +31,15 @@ class CardEndpoint(
 
     @Transactional
     @PatchMapping("{id}")
-    fun changeSubject(@PathVariable id: Int, subject: String): ResponseEntity<Any> {
+    fun changeSubject(@PathVariable id: Int, subject: String?) {
         val card = cardRepository.findById(id)
                 .orElseThrow { ResourceNotFoundException(Card::class, id) }
 
-        card.subject = subject
+        if (subject.isNullOrBlank()) {
+            return
+        }
 
-        return ResponseEntity.ok().build()
+        card.subject = subject
     }
 
     @GetMapping("{id}/content")
